@@ -1,0 +1,40 @@
+specVersion: '1.0'
+metadata:
+  name: 'template'
+type: application
+ui5Theme: sap_fiori_3
+server:
+  customMiddleware:
+  - name: ui5-middleware-simpleproxy
+    afterMiddleware: compression
+    mountPath: /sap
+    configuration:
+      baseUri: "https://launchpad.be/sap"
+      strictSSL: false
+      query:
+        sap-client: 100
+      excludePatterns:
+      - "/local/**"
+  - name: ui5-middleware-livereload
+    afterMiddleware: compression
+    configuration:
+      debug: true
+      extraExts: "xml,json,properties"
+      port: 35729
+      path: "webapp"
+builder:
+  customTasks:
+  - name: ui5-task-transpile
+    afterTask: replaceVersion
+    configuration:
+      debug: true
+      removeConsoleStatements: true
+      transpileAsync: true
+      excludePatterns:
+      - "annotations"
+      - "changes"
+      - "test"
+      - "localService"
+      - "i18n"
+      - "css"
+      - "libs"

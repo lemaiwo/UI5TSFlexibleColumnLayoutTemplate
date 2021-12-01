@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "target": "es2015",
+        "module": "es2015",
+        // "experimentalDecorators": true,
+        // "removeComments": false,
+        "skipLibCheck": true,
+        "strictNullChecks": false,
+        "strictPropertyInitialization": false,
+        "preserveConstEnums": true,
+        "sourceMap": false,
+        "allowJs": true,
+        "strict": true,
+        "checkJs": true,
+        "rootDir": "./src",
+        "outDir": "./dist",
+        "baseUrl": "./",
+        "typeRoots": [
+            "./node_modules/@types",
+            "./node_modules/@sapui5/ts-types-esm"
+        ],
+        "paths": {
+            "com/template*": [
+                "./src/*"
+            ]
+        }
+    },
+    "include": [
+        "./src/**/*"
+    ]
+}

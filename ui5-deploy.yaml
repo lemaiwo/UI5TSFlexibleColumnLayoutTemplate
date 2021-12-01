@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+
+specVersion: '1.0'
+metadata:
+  name: 'template'
+type: application
+ui5Theme: sap_fiori_3
+builder:
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**
+  customTasks:
+    - name: deploy-to-abap
+      afterTask: generateCachebusterInfo
+      configuration:
+        target:
+          url: https://launchpad.be/
+          client: 600
+          auth: basic
+        credentials:
+          username: env:SAPUSERID
+          password: env:SAPPWD
+        app:
+          name: ZHR_COMP
+          description: Compententie Management app
+          package: env:PACKAGE
+          transport: env:TRANSPORT
+    - name: ui5-task-transpile
+      afterTask: replaceVersion
+      configuration:
+        debug: true
+        removeConsoleStatements: true
+        transpileAsync: true
+        excludePatterns:
+        - "annotations"
+        - "changes"
+        - "test"
+        - "localService"
+        - "i18n"
+        - "css"
+        - "libs"

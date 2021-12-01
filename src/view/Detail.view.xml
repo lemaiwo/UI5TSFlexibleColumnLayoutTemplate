@@ -1,0 +1,210 @@
+<mvc:View controllerName="com.template.controller.Detail"
+	xmlns="sap.m"
+	xmlns:t="sap.ui.table"
+	xmlns:f="sap.f"
+	xmlns:form="sap.ui.layout.form"
+	xmlns:l="sap.ui.layout"
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:tnt="sap.tnt">
+	<f:DynamicPage id="detailPage" showFooter="{comp>/detailEditMode}"
+			stickySubheaderProvider="iconTabBar"
+			class="sapUiNoContentPadding" >
+		<f:title>
+			<f:DynamicPageTitle>
+				<f:heading>
+					<Title text="{comp>/personOverview/person/name} ({comp>/personOverview/person/pernr})" level="H2"/>
+				</f:heading>
+				<f:navigationActions>
+					<Button
+						text="{i18n>display}"
+						type="Emphasized"
+						icon="sap-icon://display"
+						press=".onDetailEditModeChanged"
+						tooltip="Weergeven"
+						visible="{comp>/detailEditMode}"/>
+					<Button
+						type="Emphasized"
+						text="{i18n>change}"
+						icon="sap-icon://edit"
+						press=".onDetailEditModeChanged"
+						tooltip="{i18n>change}"
+						visible="{= !${comp>/detailEditMode} }"/>
+					
+					<OverflowToolbarButton
+						type="Transparent"
+						icon="sap-icon://full-screen"
+						press=".handleFullScreen"
+						tooltip="{i18n>fullscreen}"
+						visible="{= ${appView>/actionButtonsInfo/midColumn/fullScreen} !== null }"/>
+					<OverflowToolbarButton
+						type="Transparent"
+						icon="sap-icon://exit-full-screen"
+						press=".handleExitFullScreen"
+						tooltip="{i18n>exitFullscreen}"
+						visible="{= ${appView>/actionButtonsInfo/midColumn/exitFullScreen} !== null }"/>
+					<OverflowToolbarButton
+						type="Transparent"
+						icon="sap-icon://decline"
+						press=".handleClose"
+						tooltip="{i18n>close}"
+						visible="{= ${appView>/actionButtonsInfo/midColumn/closeColumn} !== null }"/>
+				</f:navigationActions> 
+			</f:DynamicPageTitle>
+		</f:title>
+		<f:content>
+		<!-- <l:VerticalLayout> -->
+				<IconTabBar
+					id="iconTabBar"
+					expanded="{device>/isNoPhone}"
+					class="sapUiResponsiveContentPadding">
+					<items>
+						<IconTabFilter text="{i18n>titleScorematrix}" key="scorematrix">
+						
+							<Table 
+							inset="false"
+							mode="None"
+							items="{path:'comp>/personOverview/scoreMatrix',
+									sorter : {
+										path : 'competence/parentname',
+										group : true
+									}}">
+							<headerToolbar>		
+							<OverflowToolbar>
+							<ToolbarSpacer />
+							<Button type="Accept" tooltip="{= ${comp>/appType}==='MSS'? ${i18n>addCompetence}:${i18n>requestCompetence}}" text="{= ${comp>/appType}==='MSS'? ${i18n>addCompetence}:${i18n>requestCompetence}}" icon="sap-icon://add" press=".onAddComp" visible="{comp>/detailEditMode}"/>
+							<Button id="btn_legend" icon="sap-icon://legend"  press=".onLegend" />
+							</OverflowToolbar>
+							</headerToolbar>
+							<columns>
+								<Column>
+									<Text text="{i18n>titleCompetences}"  />
+								</Column>
+								<Column>
+									<Text text="{i18n>requiredLevel}" />
+								</Column>															
+								<Column>
+									<Text text="{i18n>level}" />
+								</Column>
+								<Column>
+									<Text text="{i18n>startDate}"/>
+								</Column>
+								<!-- <Column visible="{= !${comp>/detailEditMode} || ${comp>/appType}==='MSS' }"> -->
+								<!-- <VBox>
+									<Text text="Start date" visible="{= !${comp>/detailEditMode} }" />
+									<Text text="Acties" visible="{= ${comp>/detailEditMode} &amp;&amp; ${comp>/appType}==='MSS'}"/>
+								</VBox> -->
+								<!-- </Column> -->
+								<!-- <Column visible="{= !${comp>/detailEditMode} }"> -->
+								<Column>
+									<Text text="{i18n>endDate}" />
+								</Column>	
+								<Column>
+									<Text text="{i18n>actions}" visible="{= ${comp>/detailEditMode} &amp;&amp; ${comp>/appType}==='MSS'}"/>
+								</Column>	
+							</columns>
+							<items>
+								<ColumnListItem>
+									<cells>
+										<FlexBox justifyContent="Start" alignItems="Center">
+										<!-- <HBox>  -->
+											<Button  class="sapUiSmallMarginEnd" type="Transparent" icon="sap-icon://hint" press=".onCompInfo" />
+											<Text text="{comp>competence/name}" class="sapUiSmallMarginEnd" />
+											<Text text=" " />
+											<tnt:InfoLabel
+												text="{= ${comp>score/action} === 'INS'? ${i18n>new}:${i18n>changed}}"
+												visible="{comp>score/dirtyFlag}"
+												displayOnly="true"
+												colorScheme= "1" 
+												class="sapUiSmallMarginStart" />
+											<tnt:InfoLabel
+												text="{i18n>submitted}"
+												visible="{= !${comp>score/dirtyFlag} &amp;&amp; !!${comp>score/requested}}"
+												displayOnly="true"
+												colorScheme= "1" 
+												class="sapUiSmallMarginStart" />	
+												</FlexBox>
+										<!-- </HBox> -->
+										<VBox>
+											<Text text="{comp>score/competence/requiredleveltxt}"/>
+										</VBox>
+										<VBox>
+											<ObjectStatus text="{comp>score/scale/leveldescription}" state="{comp>score/levelState}" visible="{= !${comp>/detailEditMode} }"/>
+											<!-- <Input value="{comp>score/scale/levelid}" change=".onLevelChanged" visible="{comp>/detailEditMode}"/> -->
+											<Select forceSelection="true" selectedKey="{comp>score/scale/levelid}" change=".onLevelChanged" 
+											items="{comp>score/scales}" 
+											editable="{= ( !${comp>score/requested} &amp;&amp; ${comp>/appType}==='MSS' ) || ${comp>score/action} === 'INS'}"
+											visible="{comp>/detailEditMode}">
+												<core:Item key="{comp>levelid}" text="{comp>leveldescription}" />
+											</Select>
+														
+										</VBox>
+										<Text text="{path: 'comp>score/validfrom',  type: 'sap.ui.model.type.DateTime',  formatOptions: { pattern: 'dd.MM.yyyy' }}" /> 
+										<!-- <DatePicker	value="{path: 'comp>score/validfrom',  type: 'sap.ui.model.type.DateTime',  formatOptions: { pattern: 'dd.MM.yyyy' }}" valueFormat="dd.MM.yyyy" change="handleChange" visible="{comp>/detailEditMode}"/> -->
+										
+										<ObjectStatus text="{path: 'comp>score/validto',  type: 'sap.ui.model.type.DateTime',  formatOptions: { pattern: 'dd.MM.yyyy' }}" state="{comp>score/validState}" /> 
+										<!-- <DatePicker	value="{path: 'comp>score/validto',  type: 'sap.ui.model.type.DateTime',  formatOptions: { pattern: 'dd.MM.yyyy' }}" valueFormat="dd.MM.yyyy" change="handleChange" visible="{comp>/detailEditMode}"/> -->
+										<HBox>
+											<Button type="Accept" tooltip="{i18n>approve}"  icon="sap-icon://accept" press=".onApproveComp" visible="{= !!${comp>score/requested} &amp;&amp; ${comp>/detailEditMode} &amp;&amp; ${comp>/appType}==='MSS'}"/>
+											<Button type="Reject" tooltip="{i18n>reject}"  icon="sap-icon://decline" press=".onDelComp" visible="{= !!${comp>score/requested} &amp;&amp; ${comp>/detailEditMode} &amp;&amp; ${comp>/appType}==='MSS'}"/>
+											<Button type="Reject" tooltip="{i18n>delete}"  icon="sap-icon://delete" press=".onDelComp" visible="{= !${comp>score/requested} &amp;&amp; !!${comp>competence/deleteable} &amp;&amp; ${comp>/detailEditMode} &amp;&amp; ${comp>/appType}==='MSS'}"/>
+											<Button type="Accept" text="{i18n>extend}" tooltip="{i18n>extend}" icon="sap-icon://future" press=".onCompExtend" visible="{= !!${comp>competence/extendable} &amp;&amp; ${comp>/detailEditMode} &amp;&amp; ${comp>/appType}==='MSS'}"/>
+										</HBox>
+									</cells>
+								</ColumnListItem>
+							</items>
+							</Table>	
+						</IconTabFilter>
+						<IconTabFilter it="tmtab" text="{i18n>titleToetsingsmodel}" key="toetsingsmodel" visible="{comp>/personOverview/hasTM}">
+							<!-- <Table id="tmtable" items="{path: 'toBA45Persons',parameters:{expand:'toActiveTM,toBeApprovedTM'}}">
+								<columns>
+									<Column><Text text="Person" /></Column>
+									<Column><Text text="Valid Toetsingsmodel" /></Column>
+									<Column><Text text="To be approved toetsingsmodel" /></Column>
+									<Column><Text text="Actions" /></Column>
+								</columns>
+								<items>
+									<ColumnListItem>
+										<cells>
+											<ObjectStatus text="{Name}" />
+											<Text text="{toActiveTM/Filename}" />
+											<Text text="{toBeApprovedTM/Filename}" />
+											<Button text="Generate" press=".onGenerateTM"/>
+										</cells>
+									</ColumnListItem>
+								</items>
+							</Table> -->
+							<form:SimpleForm id="tmform" editable="false" layout="ResponsiveGridLayout" width="100%"
+								labelSpanXL="3"	labelSpanL="3" labelSpanM="3" labelSpanS="4" adjustLabelSpan="false"
+								emptySpanXL="3" emptySpanL="2" emptySpanM="0" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1" singleContainerFullSize="false" >
+								<form:toolbar>
+									<Toolbar>
+										<ToolbarSpacer />
+										<Button icon="sap-icon://accept" text="Nieuw toetsingsmodel goedkeuren" visible="{= ${comp>/appType}==='ESS' &amp;&amp; !!${toBeApprovedTM/Filename}}" press=".onApproveTM"/>
+										<Button icon="sap-icon://request" text="Genereer nieuw toetsingsmodel" visible="{= ${comp>/appType}==='MSS'}" press=".onGenerateTM"/>
+									</Toolbar>
+								</form:toolbar>
+								<form:content>
+									<Label text="{i18n>validToetsingsmodel}" />
+									<Link text="{toActiveTM/Filename}" href="/sap/opu/odata/sap/ZHR_COMP_SRV/AppSet(Type='{comp>/appType}',User='{comp>/userid}')/toBA45Persons('{Pernr}')/toActiveTM/$value"/>
+									<Label text="{i18n>toBeApprovedToetsingsmodel}" />
+									<Link text="{toBeApprovedTM/Filename}" href="/sap/opu/odata/sap/ZHR_COMP_SRV/AppSet(Type='{comp>/appType}',User='{comp>/userid}')/toBA45Persons('{Pernr}')/toBeApprovedTM/$value"/>
+								</form:content>
+							</form:SimpleForm>
+						</IconTabFilter>
+						
+					</items>
+				</IconTabBar>	
+		<!-- </l:VerticalLayout> -->
+		</f:content>
+			<f:footer>
+			<OverflowToolbar>
+                <Button icon="sap-icon://alert" text="{=${message>/}.length}" visible="{=${message>/}.length > 0}"
+                    type="Emphasized" press=".onMessagePopoverPress">
+                </Button>
+				<ToolbarSpacer/>
+				<Button text="{i18n>save}" type="Emphasized" id="btn_save" icon="sap-icon://save"  press=".onSave" visible="{comp>/detailEditMode}"/> 
+			</OverflowToolbar>			
+		</f:footer>
+	</f:DynamicPage>
+</mvc:View>

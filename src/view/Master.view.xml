@@ -1,0 +1,155 @@
+<mvc:View
+	controllerName="com.template.controller.Master"
+	xmlns="sap.m"
+	xmlns:t="sap.ui.table"
+	xmlns:f="sap.f"
+	xmlns:g="sap.gantt.simple"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns:l="sap.ui.layout"
+	xmlns:micro="sap.suite.ui.microchart"
+	xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+	<f:DynamicPage id="masterPage" 
+			stickySubheaderProvider="iconTabBar"
+			class="sapUiNoContentPadding">
+		<!-- DynamicPage Title -->
+		<f:title>
+			<f:DynamicPageTitle>
+				<f:heading>
+					<Title text="{i18n>appTitle}" level="H2"/>
+				</f:heading>
+				<f:actions>
+					<Label text="{i18n>onBehalfOf}" visible="{= !!${comp>/delegationName}}" />
+					<Label text="{comp>/delegationName}" visible="{= !!${comp>/delegationName}}" />
+					<Button id="btn_delegate" icon="sap-icon://employee"  press=".onDelegate" />
+					<!-- <Button ariaHasPopup="Dialog"  type="Accept" tooltip="Add" text="Toevoegen" icon="sap-icon://add" press=".onAddComp" /> -->
+				</f:actions>
+			</f:DynamicPageTitle>
+		</f:title>
+		<f:content>
+		<!-- <l:VerticalLayout> -->
+			<IconTabBar
+				id="iconTabBar"
+				expanded="{device>/isNoPhone}"
+				class="sapUiResponsiveContentPadding"
+				stretchContentHeight="true">
+				<items>
+					<IconTabFilter text="Scorematrix" key="scorematrix">
+						<t:TreeTable id="grid" selectionMode="None"
+							columns="{path:'comp>/persons', factory: '.createColumns'}"
+							visibleRowCountMode="Auto"
+							fixedColumnCount="1"
+							expandFirstLevel="true"
+							busy="{comp>/overviewBusy}"
+							rows="{path:'comp>/overview', parameters: {arrayNames:['competenties']}}">
+							<t:extension>
+								<OverflowToolbar id="Filterbar">
+									<!-- <Title text="Score matrix" level="H2"/>
+									<ToolbarSpacer/> -->
+									
+									<Label text="Positie:"  visible="{comp>/teamFilterVisible}" labelFor="jobCombobox">
+										<layoutData>
+											<OverflowToolbarLayoutData group="1"  priority="NeverOverflow" />
+										</layoutData>
+									</Label>
+									<MultiComboBox
+										id="jobCombobox"
+										selectedKeys="{comp>/jobsSelectedKeys}"
+										selectionFinish=".handleSelectionFinish"
+										selectionChange=".handleSelectionChanged"
+										visible="{comp>/teamFilterVisible}"
+										width="20%"
+										items="{
+											path: 'comp>/jobs',
+											sorter: { path: 'jobname' }
+										}">
+										<items>
+											<core:Item key="{comp>id}" text="{comp>name}" />
+										</items>
+										<layoutData>
+											<OverflowToolbarLayoutData group="1" shrinkable="true" minWidth="150px"  priority="NeverOverflow"/>
+										</layoutData>
+									</MultiComboBox>
+									<Label text="Competenties:"  visible="{comp>/teamFilterVisible}"  labelFor="competenceCombobox">
+										<layoutData>
+											<OverflowToolbarLayoutData group="2"   priority="High"/>
+										</layoutData>
+									</Label>
+									<MultiComboBox
+										id="competenceCombobox"
+										selectedKeys="{comp>/competencesSelectedKeys}"
+										selectionFinish=".handleSelectionFinish"
+										selectionChange=".handleSelectionChanged"
+										visible="{comp>/teamFilterVisible}"
+										width="20%"
+										items="{
+											path: 'comp>/competences',
+											sorter: { path: 'name' }
+										}">
+										<core:Item key="{comp>compid}" text="{comp>name}" />
+										<layoutData>
+											<OverflowToolbarLayoutData group="2" shrinkable="true" minWidth="150px"  priority="High"/>
+										</layoutData>
+									</MultiComboBox>
+									<Label text="Personen:"  visible="{comp>/teamFilterVisible}"  labelFor="personCombobox">
+										<layoutData>
+											<OverflowToolbarLayoutData group="3" priority="Low" />
+										</layoutData>
+									</Label>
+									<MultiComboBox
+										id="personCombobox"
+										selectedKeys="{comp>/personsSelectedKeys}"
+										selectionFinish=".handleSelectionFinish"
+										selectionChange=".handleSelectionChanged"
+										visible="{comp>/teamFilterVisible}"
+										width="20%"
+										items="{
+											path: 'comp>/personsFilter',
+											sorter: { path: 'name' }
+										}">
+										<core:Item key="{comp>pernr}" text="{comp>name}" />
+										<layoutData>
+											<OverflowToolbarLayoutData group="3" shrinkable="true" priority="Low"/>
+										</layoutData>
+									</MultiComboBox>
+									<Label text="N-2:" visible="{comp>/teamFilterVisible}"/>
+									<CheckBox id="CB_N2" selected="false" select=".handleSelectionN2"  visible="{comp>/teamFilterVisible}" />
+									
+									<ToolbarSpacer/>
+									<Button id="btn_clear_filters" icon="sap-icon://clear-filter"  press=".onClearFilters" />
+									<Button id="btn_legend" icon="sap-icon://legend"  press=".onLegend" />
+								</OverflowToolbar>
+							</t:extension>
+						</t:TreeTable>
+					</IconTabFilter>
+						<IconTabFilter text="Toetsingsmodel" key="toetsingsmodel" visible="{= ${comp>/tmTotal} &gt; 0}">					
+							<Table id="tmtable" items="{path: 'toBA45Persons',parameters:{expand:'toActiveTM,toBeApprovedTM'}}" updateFinished=".onTMUpdateFinished">
+								<columns>
+									<Column><Text text="{i18n>titlePerson}" /></Column>
+									<Column><Text text="{i18n>validToetsingsmodel}" /></Column>
+									<Column><Text text="{i18n>toBeApprovedToetsingsmodel}" /></Column>
+									<Column><Text text="{i18n>actions}" /></Column>
+								</columns>
+								<items>
+									<ColumnListItem>
+										<cells>
+											<ObjectStatus text="{Name}" active="true" press=".showDetail($event,${Pernr})" />
+											<Link text="{toActiveTM/Filename}" href="/sap/opu/odata/sap/ZHR_COMP_SRV/AppSet(Type='{comp>/appType}',User='{comp>/userid}')/toBA45Persons('{Pernr}')/toActiveTM/$value"/>
+											<Link text="{toBeApprovedTM/Filename}" href="/sap/opu/odata/sap/ZHR_COMP_SRV/AppSet(Type='{comp>/appType}',User='{comp>/userid}')/toBA45Persons('{Pernr}')/toBeApprovedTM/$value"/>
+											<Button text="Generate" press=".onGenerateTM"/>
+										</cells>
+									</ColumnListItem>
+								</items>
+							</Table>
+						</IconTabFilter>
+					</items>
+				</IconTabBar>	
+					
+			<!-- <t:Table id="grid" visibleRowCount="7" selectionMode="None"
+				columns="{path:'comp>/persons', factory: '.createColumns'}"
+				rows="{path:'comp>/overview'}">
+			</t:Table> -->
+			<!-- </l:VerticalLayout> -->
+		</f:content>
+	</f:DynamicPage>
+</mvc:View>
