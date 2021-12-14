@@ -1,6 +1,6 @@
 specVersion: '2.0'
 metadata:
-  name: 'competentiemanagment'
+  name: 'template'
 type: application
 framework:
   name: SAPUI5
@@ -22,9 +22,8 @@ server:
     configuration:
       ignoreCertError: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
       backend:
-      - path: /sap
-        url: https://launchpad.be/
-        client: '100'
+      - path: /v2
+        url: https://services.odata.org/
   - name: fiori-tools-appreload
     afterMiddleware: compression
     configuration:
