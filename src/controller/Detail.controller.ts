@@ -10,38 +10,47 @@ import {inputParameters} from "./App.controller";
  */
 export default class Detail extends BaseController {
 	private id: string;
-	// // shortcut for sap.m.URLHelper
-	// var URLHelper = mobileLibrary.URLHelper;
-	// formatter: formatter,
 	private formatter = formatter;
-	
 	public onInit(): void {
-		this.getRouter().getRoute("master").attachPatternMatched((event:UI5Event)=>this.onObjectMatched(event), this);
-	}
-	/* =========================================================== */
-	/* begin: internal methods                                     */
-	/* =========================================================== */
+		const viewModel = new JSONModel({
+			busy : false,
+			delay:0
+		});
+		this.setModel(viewModel, "detailView");
 
-	/**
-	 * Binds the view to the object path and expands the aggregated line items.
-	 * @function
-	 * @param {sap.ui.base.Event} oEvent pattern match event in route 'object'
-	 * @private
-	 */
+		this.getRouter().getRoute("detail").attachPatternMatched((event:UI5Event)=>this.onObjectMatched(event), this);
+	}
 	private onObjectMatched(oEvent: UI5Event): void {
-		const sObjectId = (oEvent.getParameter("arguments") as inputParameters).id;
-		this.id = sObjectId || "";
-		(this.getModel("appView") as JSONModel).setProperty("/layout", "TwoColumnsMidExpanded");
+		const viewModel = (this.getModel("detailView") as JSONModel);
+		this.id = (oEvent.getParameter("arguments") as inputParameters).id || this.id || "0";
 		(this.getModel() as ODataModel).metadataLoaded().then( ()=> {
-			//binding
+			const path = (this.getModel() as ODataModel).createKey("/Products",{
+				ID:this.id
+			});
+			this.getView().bindElement({
+				path: path,
+				parameters:{expand:"Supplier,Category"},
+				events:{
+                    change : ()=>this.onBindingChange(),
+                    dataRequested : ()=>{
+                        viewModel.setProperty("/busy", true);
+                    },
+                    dataReceived: function () {
+                        viewModel.setProperty("/busy", false);
+                    }
+				}
+			});
 		});
 	}
-	/**
-	 * Set the full screen mode to false and navigate to master page
-	 */
+	private onBindingChange() {
+		const elementBinding = this.getView().getElementBinding();
+		// No data for the binding
+		if (!elementBinding.getBoundContext()) {
+			this.getRouter().getTargets().display("detailObjectNotFound");
+		}
+	}
 	public onCloseDetailPress(): void {
 		(this.getModel("appView") as JSONModel).setProperty("/actionButtonsInfo/midColumn/fullScreen", false);
-		// No item should be selected on master after detail page is closed
 		this.getRouter().navTo("master");
 	}
 
@@ -57,7 +66,7 @@ export default class Detail extends BaseController {
 
 	public handleClose(): void {
 		const sNextLayout = ((this.getModel("appView") as JSONModel).getProperty("/actionButtonsInfo/midColumn/closeColumn") as string);
-		this.getRouter().navTo("mss", { layout: sNextLayout });
+		this.getRouter().navTo("master", { layout: sNextLayout });
 	}
 
 }

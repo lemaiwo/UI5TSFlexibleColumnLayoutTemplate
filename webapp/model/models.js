@@ -1,0 +1,11 @@
+sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/model/BindingMode", "sap/ui/Device"], function (JSONModel, BindingMode, Device) {
+  var __exports = {
+    createDeviceModel: () => {
+      const oModel = new JSONModel(Device);
+      oModel.setDefaultBindingMode(BindingMode.OneWay);
+      return oModel;
+    }
+  };
+  return __exports;
+});
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9tb2RlbC9tb2RlbHMudHMiXSwibmFtZXMiOlsiY3JlYXRlRGV2aWNlTW9kZWwiLCJvTW9kZWwiLCJKU09OTW9kZWwiLCJEZXZpY2UiLCJzZXREZWZhdWx0QmluZGluZ01vZGUiLCJCaW5kaW5nTW9kZSIsIk9uZVdheSJdLCJtYXBwaW5ncyI6IjtrQkFJZTtBQUVkQSxJQUFBQSxpQkFBaUIsRUFBRyxNQUFNO0FBQ3pCLFlBQU1DLE1BQU0sR0FBRyxJQUFJQyxTQUFKLENBQWNDLE1BQWQsQ0FBZjtBQUNBRixNQUFBQSxNQUFNLENBQUNHLHFCQUFQLENBQTZCQyxXQUFXLENBQUNDLE1BQXpDO0FBQ0EsYUFBT0wsTUFBUDtBQUNBO0FBTmEsRyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBKU09OTW9kZWwgZnJvbSBcInNhcC91aS9tb2RlbC9qc29uL0pTT05Nb2RlbFwiO1xyXG5pbXBvcnQgQmluZGluZ01vZGUgZnJvbSBcInNhcC91aS9tb2RlbC9CaW5kaW5nTW9kZVwiO1xyXG5pbXBvcnQgKiBhcyBEZXZpY2UgZnJvbSBcInNhcC91aS9EZXZpY2VcIjtcclxuXHJcbmV4cG9ydCBkZWZhdWx0IHtcclxuXHJcblx0Y3JlYXRlRGV2aWNlTW9kZWwgOiAoKSA9PiB7XHJcblx0XHRjb25zdCBvTW9kZWwgPSBuZXcgSlNPTk1vZGVsKERldmljZSk7XHJcblx0XHRvTW9kZWwuc2V0RGVmYXVsdEJpbmRpbmdNb2RlKEJpbmRpbmdNb2RlLk9uZVdheSk7XHJcblx0XHRyZXR1cm4gb01vZGVsO1xyXG5cdH1cclxuXHJcbn07Il19

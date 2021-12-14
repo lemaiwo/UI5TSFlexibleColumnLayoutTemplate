@@ -22,21 +22,7 @@ builder:
           username: env:SAPUSERID
           password: env:SAPPWD
         app:
-          name: ZHR_COMP
-          description: Compententie Management app
+          name: ZBSP_APP_NAME
+          description: New app with TypeScript
           package: env:PACKAGE
           transport: env:TRANSPORT
-    - name: ui5-task-transpile
-      afterTask: replaceVersion
-      configuration:
-        debug: true
-        removeConsoleStatements: true
-        transpileAsync: true
-        excludePatterns:
-        - "annotations"
-        - "changes"
-        - "test"
-        - "localService"
-        - "i18n"
-        - "css"
-        - "libs"
